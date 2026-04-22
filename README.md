@@ -26,5 +26,5 @@ Fully automated deployment of a full-stack e-commerce application on production-
 ```bash
 ├── terraform/          # Infrastructure as Code
 ├── jenkins/Jenkinsfile # CI/CD Pipeline
-├── application/        # React + Spring Boot source (optional)
+├── application/        # React + Spring Boot source
 └── docker/             # Docker configuration
