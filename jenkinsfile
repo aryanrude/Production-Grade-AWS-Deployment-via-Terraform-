@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = "aryanrude/ecommerce-app:${BUILD_NUMBER}"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/aryanrude/Production-Grade-AWS-Deployment-via-Terraform-.git'
+            }
+        }
+        stage('Build Backend (Spring Boot)') {
+            steps {
+                dir('application/backend') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+        stage('Build Frontend (React)') {
+            steps {
+                dir('application/frontend') {
+                    sh 'npm install && npm run build'
+                }
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE -f docker/Dockerfile.backend application/backend'
+                sh 'docker build -t ${DOCKER_IMAGE}-frontend -f docker/Dockerfile.frontend application/frontend'
+            }
+        }
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    sh 'docker push $DOCKER_IMAGE'
+                }
+            }
+        }
+        stage('Deploy to AWS') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform init'
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo '✅ Deployment Successful!'
+        }
+    }
+}
