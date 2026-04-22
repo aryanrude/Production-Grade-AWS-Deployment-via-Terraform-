@@ -13,7 +13,7 @@ End-to-end CI/CD pipeline that automates the deployment of a full-stack web appl
 - **Containerization**: Docker
 - **Monitoring**: CloudWatch Alarms + Auto Scaling
 
-*(Add an architecture diagram here - you can create one using draw.io or Excalidraw and upload as image)*
+
 
 ## Features
 
